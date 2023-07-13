@@ -37,13 +37,8 @@ public:
         cout << "Matrix move constructor" << endl;
         this->row = obj.row;
         this->column = obj.column;
-        this->init();
-        for (int i = 0; i < this->row; i++) {
-            for (int g = 0; g < this->column; g++) {
-                this->matrix[i][g] = obj.matrix[i][g];
-            }
-        }
-        delete[] obj.matrix;
+        this->matrix = obj.matrix;
+        obj.matrix = nullptr;
         obj.row = 0;
         obj.column = 0;
     }
@@ -52,9 +47,10 @@ public:
         if (this != &obj) {
             for (int i = 0; i < this->row; i++) {
                 delete[] this->matrix[i];
-
+                this->matrix[i] = nullptr;
             }
             delete[] this->matrix;
+            this->matrix = nullptr;
             this->row = obj.row;
             this->column = obj.column;
             this->init();
@@ -67,28 +63,27 @@ public:
         return *this;
     }
 
-    Matrix& operator = (Matrix&& obj) {
-        cout << "Matrix operator move assignment" << endl;
-        if (this != &obj) {
-            for (int i = 0; i < this->row; i++) {
-                delete[] this->matrix[i];
+     Matrix& operator = (Matrix&& obj) {
+         cout << "Matrix operator move assignment" << endl;
+         if (this != &obj) {
+             if (this->row > 1 && this->column > 1) {
+                 for (int i = 0; i < this->row; i++) {
+                     delete[] this->matrix[i];
+                     this->matrix[i] = nullptr;
+                 }
+                 delete[] this->matrix;
+                 this->matrix = nullptr;
+             }
+             this->row = obj.row;
+             this->column = obj.column;
+             this->matrix = obj.matrix;
+             obj.matrix = nullptr;
+             obj.row = 0;
+             obj.column = 0;
+         }
 
-            }
-            delete[] this->matrix;
-            this->row = obj.row;
-            this->column = obj.column;
-            this->init();
-            for (int i = 0; i < this->row; i++) {
-                for (int g = 0; g < this->column; g++) {
-                    this->matrix[i][g] = obj.matrix[i][g];
-                }
-            }
-            delete[] obj.matrix;
-            obj.row = 0;
-            obj.column = 0;
-        }
-        return *this;
-    }
+         return *this;
+     }
 
     void swap_columns(int column_1, int column_2) {
         if (column_1 > 0 && column_1 <= column && column_2 > 0 && column_2 <= column && column_1 != column_2) {
@@ -212,11 +207,11 @@ void class_matrix_with_operator_assign_and_copy_constructor() {
 
 void check_move() {
     cout << endl;
-    Matrix m_1 = std::move(Matrix(4,3));
+    Matrix m_1 = move(Matrix(4, 3));
     cout << endl;
     m_1.output();
     cout << endl;
-    m_1 = std::move(Matrix(5, 6));
+    m_1 = move(Matrix(2, 3));
     cout << endl;
     m_1.output();
     cout << endl;
