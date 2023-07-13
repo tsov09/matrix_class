@@ -66,14 +66,12 @@ public:
      Matrix& operator = (Matrix&& obj) {
          cout << "Matrix operator move assignment" << endl;
          if (this != &obj) {
-             if (this->row > 1 && this->column > 1) {
-                 for (int i = 0; i < this->row; i++) {
-                     delete[] this->matrix[i];
-                     this->matrix[i] = nullptr;
-                 }
-                 delete[] this->matrix;
-                 this->matrix = nullptr;
-             }
+            for (int i = 0; i < this->row; i++) {
+                delete[] this->matrix[i];
+                this->matrix[i] = nullptr;
+            }
+            delete[] this->matrix;
+            this->matrix = nullptr;
              this->row = obj.row;
              this->column = obj.column;
              this->matrix = obj.matrix;
