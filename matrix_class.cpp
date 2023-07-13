@@ -33,6 +33,20 @@ public:
             }
         }
     }
+    Matrix(Matrix&& obj) {
+        cout << "Matrix move constructor" << endl;
+        this->row = obj.row;
+        this->column = obj.column;
+        this->init();
+        for (int i = 0; i < this->row; i++) {
+            for (int g = 0; g < this->column; g++) {
+                this->matrix[i][g] = obj.matrix[i][g];
+            }
+        }
+        delete[] obj.matrix;
+        obj.row = 0;
+        obj.column = 0;
+    }
 
     Matrix& operator = (const Matrix& obj) {
         if (this != &obj) {
@@ -41,17 +55,37 @@ public:
 
             }
             delete[] this->matrix;
-
             this->row = obj.row;
             this->column = obj.column;
-
             this->init();
-
             for (int i = 0; i < this->row; i++) {
                 for (int g = 0; g < this->column; g++) {
                     this->matrix[i][g] = obj.matrix[i][g];
                 }
             }
+        }
+        return *this;
+    }
+
+    Matrix& operator = (Matrix&& obj) {
+        cout << "Matrix operator move assignment" << endl;
+        if (this != &obj) {
+            for (int i = 0; i < this->row; i++) {
+                delete[] this->matrix[i];
+
+            }
+            delete[] this->matrix;
+            this->row = obj.row;
+            this->column = obj.column;
+            this->init();
+            for (int i = 0; i < this->row; i++) {
+                for (int g = 0; g < this->column; g++) {
+                    this->matrix[i][g] = obj.matrix[i][g];
+                }
+            }
+            delete[] obj.matrix;
+            obj.row = 0;
+            obj.column = 0;
         }
         return *this;
     }
@@ -176,9 +210,21 @@ void class_matrix_with_operator_assign_and_copy_constructor() {
     matrix_3.output();
 }
 
+void check_move() {
+    cout << endl;
+    Matrix m_1 = std::move(Matrix(4,3));
+    cout << endl;
+    m_1.output();
+    cout << endl;
+    m_1 = std::move(Matrix(5, 6));
+    cout << endl;
+    m_1.output();
+    cout << endl;
+}
+
 int main() {
     srand(time(nullptr));
-    class_matrix_with_operator_assign_and_copy_constructor();
-
+    //class_matrix_with_operator_assign_and_copy_constructor();
+    check_move();
     return 0;
 }
