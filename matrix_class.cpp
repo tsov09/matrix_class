@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 #include <ctime>
 
@@ -114,6 +115,18 @@ public:
         }
     }
 
+    void print_in_file() {
+        ofstream my_file;
+        my_file.open("matrix.txt");
+        for (int i = 0; i < this->row; i++) {
+            for (int g = 0; g < this->column; g++) {
+                my_file << this->matrix[i][g] << " ";
+            }
+            my_file << endl;
+        }
+        my_file.close();
+    }
+
     ~Matrix() {
         for (int i = 0; i < this->row; i++) {
             delete[] this->matrix[i];
@@ -218,6 +231,10 @@ void check_move() {
 int main() {
     srand(time(nullptr));
     //class_matrix_with_operator_assign_and_copy_constructor();
-    check_move();
+    //check_move();
+
+    Matrix matrix(9, 7);
+    matrix.print_in_file();
+
     return 0;
 }
