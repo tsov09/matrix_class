@@ -2,6 +2,8 @@
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
+#include <vector>
+#include <thread>
 
 using namespace std;
 
@@ -64,25 +66,25 @@ public:
         return *this;
     }
 
-     Matrix& operator = (Matrix&& obj) {
-         cout << "Matrix operator move assignment" << endl;
-         if (this != &obj) {
+    Matrix& operator = (Matrix&& obj) {
+        cout << "Matrix operator move assignment" << endl;
+        if (this != &obj) {
             for (int i = 0; i < this->row; i++) {
                 delete[] this->matrix[i];
                 this->matrix[i] = nullptr;
             }
             delete[] this->matrix;
             this->matrix = nullptr;
-             this->row = obj.row;
-             this->column = obj.column;
-             this->matrix = obj.matrix;
-             obj.matrix = nullptr;
-             obj.row = 0;
-             obj.column = 0;
-         }
+            this->row = obj.row;
+            this->column = obj.column;
+            this->matrix = obj.matrix;
+            obj.matrix = nullptr;
+            obj.row = 0;
+            obj.column = 0;
+        }
 
-         return *this;
-     }
+        return *this;
+    }
 
     void swap_columns(int column_1, int column_2) {
         if (column_1 > 0 && column_1 <= column && column_2 > 0 && column_2 <= column && column_1 != column_2) {
@@ -104,6 +106,36 @@ public:
         else {
             cout << "Rows' numbers must match matrix sizes and can't be equal to each other." << endl;
         }
+    }
+
+    static void add_to_sum(int& sum, int* m, int c) {
+        for (int g = 0; g < c; g++) {
+            sum += m[g];
+        }
+    }
+    int sum_of_elements_by_multithreading() {
+        vector<thread> threads;
+        int sum = 0;
+
+        for (int i = 0; i < row; i++) {
+            thread t(Matrix::add_to_sum, ref(sum), ref(matrix[i]), ref(column));
+            threads.push_back(move(t));
+        }
+        for (int i = 0; i < row; i++) {
+            threads[i].join();
+        }
+        return sum;
+    }
+    int sum_of_elements() {
+        vector<thread> threads;
+        int sum = 0;
+
+        for (int i = 0; i < row; i++) {
+            for (int g = 0; g < column; g++) {
+                sum += matrix[i][g];
+            }
+        }
+        return sum;
     }
 
     void output() {
@@ -233,8 +265,15 @@ int main() {
     //class_matrix_with_operator_assign_and_copy_constructor();
     //check_move();
 
-    Matrix matrix(9, 7);
-    matrix.print_in_file();
+    Matrix matrix(20, 30);
+    matrix.output();
+    cout << endl;
+    int sum_thread = matrix.sum_of_elements_by_multithreading();
+    cout << "Sum by multithreading " << sum_thread << endl;
+    int sum = matrix.sum_of_elements();
+    cout << "Sum by single thread " << sum << endl;
+    //matrix.print_in_file();
+
 
     return 0;
 }
